@@ -35,7 +35,7 @@ public class EmployeeController {
     private JwtProperties jwtProperties;
 
     /**
-     * 登录
+     * login
      *
      * @param employeeLoginDTO
      * @return
@@ -43,7 +43,7 @@ public class EmployeeController {
     @PostMapping("/login")
     @ApiOperation(value = "employee login")
     public Result<EmployeeLoginVO> login(@RequestBody EmployeeLoginDTO employeeLoginDTO) {
-        log.info("员工登录：{}", employeeLoginDTO);
+        log.info("employee login：{}", employeeLoginDTO);
 
         Employee employee = employeeService.login(employeeLoginDTO);
 
