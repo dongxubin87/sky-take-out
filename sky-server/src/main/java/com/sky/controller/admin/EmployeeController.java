@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 员工管理
+ * employee management
  */
 @RestController
 @RequestMapping("/admin/employee")
