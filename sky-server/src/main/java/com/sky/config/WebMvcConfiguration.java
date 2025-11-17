@@ -72,6 +72,9 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
         log.info("start to setting static maps...");
         registry.addResourceHandler("/doc.html").addResourceLocations("classpath:/META-INF/resources/");
         registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
+
+        registry.addResourceHandler("/static/**")
+                .addResourceLocations("/Users/jackdong/work/sky-take-out/sky-server/src/main/resources/upload/");
     }
 
     /**
