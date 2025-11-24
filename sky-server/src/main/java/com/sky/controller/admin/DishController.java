@@ -2,16 +2,17 @@ package com.sky.controller.admin;
 
 
 import com.sky.dto.DishDTO;
+import com.sky.dto.DishPageQueryDTO;
+import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.DishService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * dishes management
@@ -21,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = "dishes management")
 @Slf4j
 public class DishController {
-
 
     @Autowired
     private DishService dishService;
@@ -36,6 +36,33 @@ public class DishController {
     public Result save(@RequestBody DishDTO dishDTO) {
         log.info("add new dish:{}", dishDTO);
         dishService.saveWithFlavor(dishDTO);
+        return Result.success();
+    }
+
+    /**
+     * DishPageQueryDTO
+     * @param dishPageQueryDTO
+     * @return
+     */
+    @GetMapping("/page")
+    @ApiOperation("dish page query")
+    public Result<PageResult> page(DishPageQueryDTO dishPageQueryDTO) {
+        log.info("dish page query:{}", dishPageQueryDTO);
+        PageResult pageResult = dishService.pageQuery(dishPageQueryDTO);
+        return Result.success(pageResult);
+    }
+
+
+    /**
+     * Batch deletion for dishes
+     * @param ids
+     * @return Result
+     */
+    @DeleteMapping
+    @ApiOperation("Batch deletion for dishes")
+    public Result delete(@RequestParam List<Long> ids ) {
+    log.info("Batch deletion for dishes:{}", ids);
+    dishService.deleteBatch(ids);
         return Result.success();
     }
 }
