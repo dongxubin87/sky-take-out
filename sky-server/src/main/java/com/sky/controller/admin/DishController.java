@@ -6,6 +6,7 @@ import com.sky.dto.DishPageQueryDTO;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.DishService;
+import com.sky.vo.DishVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +53,6 @@ public class DishController {
         return Result.success(pageResult);
     }
 
-
     /**
      * Batch deletion for dishes
      * @param ids
@@ -63,6 +63,33 @@ public class DishController {
     public Result delete(@RequestParam List<Long> ids ) {
     log.info("Batch deletion for dishes:{}", ids);
     dishService.deleteBatch(ids);
+        return Result.success();
+    }
+
+    /**
+     * dish query by id
+     * @param id
+     * @return
+     */
+    @GetMapping("/{id}")
+    @ApiOperation("dish query by id")
+    public Result<DishVO> getById(@PathVariable Long id) {
+        log.info("get by id:{}", id);
+        DishVO dishVO =  dishService.getByIdWithFlavor(id);
+        return Result.success(dishVO);
+    }
+
+
+    /**
+     * update dish
+     * @return
+     */
+
+    @PutMapping
+    @ApiOperation("update dish")
+    public Result update(@RequestBody DishDTO dishDTO){
+        log.info("update dish:{}", dishDTO);
+        dishService.updateWithFlavor(dishDTO);
         return Result.success();
     }
 }

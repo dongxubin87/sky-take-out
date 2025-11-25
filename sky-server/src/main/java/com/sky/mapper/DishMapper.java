@@ -11,6 +11,8 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.List;
+
 @Mapper
 public interface DishMapper {
 
@@ -54,4 +56,20 @@ public interface DishMapper {
 
     @Delete("delete from dish where id = #{id}")
     void deleteById(@Param("id") Long id);
+
+
+    /**
+     * batch deletion dish set ids
+     * @param dishIds
+     */
+    void deleteByIds(List<Long> dishIds);
+
+
+    /**
+     * update dish
+     * @param dish
+     */
+
+    @AutoFill(value = OperationType.UPDATE)
+    void update(Dish dish);
 }

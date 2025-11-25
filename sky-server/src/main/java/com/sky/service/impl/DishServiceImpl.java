@@ -94,10 +94,68 @@ public class DishServiceImpl implements DishService {
         }
 
         // start deleting dish
-        for(Long id : ids){
-            dishMapper.deleteById(id);
-            // delete related dish_flavor
-            dishFlavorMapper.deleteByDishId(id);
+//        for(Long id : ids){
+//            dishMapper.deleteById(id);
+//            // delete related dish_flavor
+//            dishFlavorMapper.deleteByDishId(id);
+//        }
+
+        // sql delete from dish where id in (???)
+        dishMapper.deleteByIds(ids);
+
+        // sql delete from dish_flavor where id in (???)
+        dishFlavorMapper.deleteByDishIds(ids);
+    }
+
+
+    /**
+     * get dish By Id With Flavor
+     * @param id
+     * @return
+     */
+    @Override
+    public DishVO getByIdWithFlavor(Long id) {
+
+        // query dish by id
+        Dish dish = dishMapper.getById(id);
+
+        //query flavor b dish id
+        List<DishFlavor> dishFlavor = dishFlavorMapper.getbyDishId(id);
+
+        // Populate the DishVO with this data
+
+        DishVO dishVO = new DishVO();
+
+        BeanUtils.copyProperties(dish, dishVO);
+
+        dishVO.setFlavors(dishFlavor);
+
+        return dishVO;
+    }
+
+
+    /**
+     * update dish
+     * @return
+     */
+
+    @Override
+    public void updateWithFlavor(DishDTO dishDTO) {
+
+        Dish dish =new Dish();
+        // update dish original data
+        BeanUtils.copyProperties(dishDTO, dish);
+        dishMapper.update(dish);
+        // delete all dish flavor
+        dishFlavorMapper.deleteByDishId(dish.getId());
+        // insert dish flavor
+        List<DishFlavor> flavors = dishDTO.getFlavors();
+
+        if(flavors!=null && !flavors.isEmpty()){
+            flavors.forEach(dishFlavor -> {
+                dishFlavor.setDishId(dishDTO.getId());
+            });
+            dishFlavorMapper.insertBatch(flavors);
         }
     }
 }
