@@ -42,6 +42,18 @@ sky:
     # set the name comes from frontend
     admin-token-name: token
 
+    # set JWT encryption key
+    user-secret-key: itheima
+    # set expired time
+    user-ttl: 72000000
+    # set the name comes from frontend
+    user-token-name: authentication
+
+
+  wechat:
+    appid: ${sky.wechat.appid}
+    secret: ${sky.wechat.secret}
+
   alioss:
     endpoint: ${sky.alioss.endpoint}
     access-key-id: ${sky.alioss.access-key-id}
