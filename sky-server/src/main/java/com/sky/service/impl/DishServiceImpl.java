@@ -8,10 +8,12 @@ import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
+import com.sky.entity.Setmeal;
 import com.sky.exception.DeletionNotAllowedException;
 import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetmealDishMapper;
+import com.sky.mapper.SetmealMapper;
 import com.sky.result.PageResult;
 import com.sky.service.DishService;
 import com.sky.vo.DishVO;
@@ -35,11 +37,14 @@ public class DishServiceImpl implements DishService {
     private DishFlavorMapper dishFlavorMapper;
 
     @Autowired
-
     private SetmealDishMapper setmealDishMapper;
+
+    @Autowired
+    private SetmealMapper setmealMapper;
 
     /**
      * add new dish with flavor
+     *
      * @param dishDTO
      */
     @Override
@@ -55,7 +60,7 @@ public class DishServiceImpl implements DishService {
         Long dishId = dish.getId();
         // insert n pieces of data into dishFlavor table
         List<DishFlavor> flavors = dishDTO.getFlavors();
-        if(flavors!=null && !flavors.isEmpty()){
+        if (flavors != null && !flavors.isEmpty()) {
             flavors.forEach(dishFlavor -> {
                 dishFlavor.setDishId(dishId);
             });
@@ -65,17 +70,20 @@ public class DishServiceImpl implements DishService {
 
     /**
      * DishPageQueryDTO
+     *
      * @param dishPageQueryDTO
      * @return
      */
     @Override
     public PageResult pageQuery(DishPageQueryDTO dishPageQueryDTO) {
-        PageHelper.startPage(dishPageQueryDTO.getPage(),dishPageQueryDTO.getPageSize());
+        PageHelper.startPage(dishPageQueryDTO.getPage(), dishPageQueryDTO.getPageSize());
         Page<DishVO> page = dishMapper.pageQuery(dishPageQueryDTO);
-        return new PageResult(page.getTotal(),page.getResult());
+        return new PageResult(page.getTotal(), page.getResult());
     }
+
     /**
      * Batch deletion for dishes
+     *
      * @param ids
      * @return Result
      */
@@ -84,8 +92,8 @@ public class DishServiceImpl implements DishService {
         // check each dish is in sale
         for (Long id : ids) {
             Dish dish = dishMapper.getById(id);
-            if(dish.getStatus() == StatusConstant.ENABLE){
-               throw new DeletionNotAllowedException(MessageConstant.DISH_ON_SALE);
+            if (dish.getStatus() == StatusConstant.ENABLE) {
+                throw new DeletionNotAllowedException(MessageConstant.DISH_ON_SALE);
             }
         }
         // check each dish is relevant with setMeal
@@ -111,6 +119,7 @@ public class DishServiceImpl implements DishService {
 
     /**
      * get dish By Id With Flavor
+     *
      * @param id
      * @return
      */
@@ -137,13 +146,14 @@ public class DishServiceImpl implements DishService {
 
     /**
      * update dish
+     *
      * @return
      */
 
     @Override
     public void updateWithFlavor(DishDTO dishDTO) {
 
-        Dish dish =new Dish();
+        Dish dish = new Dish();
         // update dish original data
         BeanUtils.copyProperties(dishDTO, dish);
         dishMapper.update(dish);
@@ -152,7 +162,7 @@ public class DishServiceImpl implements DishService {
         // insert dish flavor
         List<DishFlavor> flavors = dishDTO.getFlavors();
 
-        if(flavors!=null && !flavors.isEmpty()){
+        if (flavors != null && !flavors.isEmpty()) {
             flavors.forEach(dishFlavor -> {
                 dishFlavor.setDishId(dishDTO.getId());
             });
@@ -163,6 +173,7 @@ public class DishServiceImpl implements DishService {
 
     /**
      * get dish by categoryId
+     *
      * @param categoryId
      * @return
      */
@@ -177,6 +188,7 @@ public class DishServiceImpl implements DishService {
 
     /**
      * 条件查询菜品和口味
+     *
      * @param dish
      * @return
      */
@@ -187,7 +199,7 @@ public class DishServiceImpl implements DishService {
 
         for (Dish d : dishList) {
             DishVO dishVO = new DishVO();
-            BeanUtils.copyProperties(d,dishVO);
+            BeanUtils.copyProperties(d, dishVO);
 
             //根据菜品id查询对应的口味
             List<DishFlavor> flavors = dishFlavorMapper.getByDishId(d.getId());
@@ -197,5 +209,39 @@ public class DishServiceImpl implements DishService {
         }
 
         return dishVOList;
+    }
+
+
+    /**
+     * Enable/Disable dish sale
+     *
+     * @param status
+     * @param id
+     * @return
+     */
+    @Transactional
+    public void startOrStop(Integer status, Long id) {
+        Dish dish = Dish.builder()
+                .id(id)
+                .status(status)
+                .build();
+        dishMapper.update(dish);
+
+        if (status == StatusConstant.DISABLE) {
+            // 如果是停售操作，还需要将包含当前菜品的套餐也停售
+            List<Long> dishIds = new ArrayList<>();
+            dishIds.add(id);
+            // select setmeal_id from setmeal_dish where dish_id in (?,?,?)
+            List<Long> setmealIds = setmealDishMapper.getSetmealIdsByDishIds(dishIds);
+            if (setmealIds != null && setmealIds.size() > 0) {
+                for (Long setmealId : setmealIds) {
+                    Setmeal setmeal = Setmeal.builder()
+                            .id(setmealId)
+                            .status(StatusConstant.DISABLE)
+                            .build();
+                    setmealMapper.update(setmeal);
+                }
+            }
+        }
     }
 }
