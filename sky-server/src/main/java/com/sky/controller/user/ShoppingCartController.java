@@ -43,4 +43,15 @@ public class ShoppingCartController {
         return  Result.success(list);
     }
 
+
+    /**
+     * clean cart
+     * @return
+     */
+    @DeleteMapping("/clean")
+    @ApiOperation("clean cart")
+    public Result clean(){
+        shoppingCartService.cleanShoppingCart();
+        return   Result.success();
+    }
 }
