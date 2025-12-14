@@ -54,4 +54,13 @@ public class ShoppingCartController {
         shoppingCartService.cleanShoppingCart();
         return   Result.success();
     }
+
+
+    @PostMapping("/sub")
+    @ApiOperation("Decrement the cart item quantity by 1")
+    public Result sub(@RequestBody ShoppingCartDTO shoppingCartDTO) {
+        log.info("sub cart {}", shoppingCartDTO);
+        shoppingCartService.subShoppingCart(shoppingCartDTO);
+        return  Result.success();
+    }
 }

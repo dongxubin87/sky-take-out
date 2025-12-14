@@ -24,4 +24,11 @@ public interface ShoppingCartService {
      * clean cart
      */
     void cleanShoppingCart();
+
+
+    /**
+     * Decrement the cart item quantity by 1
+     * @param shoppingCartDTO
+     */
+    void subShoppingCart(ShoppingCartDTO shoppingCartDTO);
 }
