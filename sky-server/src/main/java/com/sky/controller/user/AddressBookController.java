@@ -12,7 +12,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController("/user/addressBook")
+@RestController
+@RequestMapping("/user/addressBook")
 @Api(tags = "Address relevant apis")
 public class AddressBookController {
     @Autowired
