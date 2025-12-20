@@ -58,7 +58,8 @@ private OrderService orderService;
      * @param status
      * @return
      */
-
+    @GetMapping("/historyOrders")
+    @ApiOperation("history orders query")
     public Result<PageResult> page(int page, int pageSize, Integer status) {
         PageResult pageResult = orderService.pageQuery4User(page, pageSize, status);
         return Result.success(pageResult);

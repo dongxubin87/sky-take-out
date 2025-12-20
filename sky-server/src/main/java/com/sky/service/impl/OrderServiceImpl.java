@@ -135,26 +135,35 @@ public class OrderServiceImpl implements OrderService {
         User user = userMapper.getById(userId);
 
         //generate prepaid order
-        JSONObject jsonObject = weChatPayUtil.pay(
-                ordersPaymentDTO.getOrderNumber(),
-                new BigDecimal(0.01),
-                "sky-takeout-order",
-                user.getOpenid()
-        );
+//        JSONObject jsonObject = weChatPayUtil.pay(
+//                ordersPaymentDTO.getOrderNumber(),
+//                new BigDecimal(0.01),
+//                "sky-takeout-order",
+//                user.getOpenid()
+//        );
+//
+//        if (jsonObject.getString("code") != null && jsonObject.getString("code").equals("ORDERPAID")) {
+//            throw new OrderBusinessException("the order was paid");
+//        }
 
-        if (jsonObject.getString("code") != null && jsonObject.getString("code").equals("ORDERPAID")) {
-            throw new OrderBusinessException("the order was paid");
-        }
-
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("code", "ORDERPAID");
         OrderPaymentVO vo = jsonObject.toJavaObject(OrderPaymentVO.class);
         vo.setPackageStr(jsonObject.getString("package"));
 
+        Integer OrderPaidStatus = Orders.PAID;
+        Integer OrderStatus = Orders.TO_BE_CONFIRMED;
+
+        LocalDateTime check_out_time = LocalDateTime.now();
+
+        String orderNumber = ordersPaymentDTO.getOrderNumber();
+        log.info("call updatestatus");
+        orderMapper.updateStatus(OrderStatus, OrderPaidStatus, check_out_time, orderNumber);
         return vo;
     }
 
     /**
      * after payment, update order status
-     *
      * @param outTradeNo
      */
     public void paySuccess(String outTradeNo) {

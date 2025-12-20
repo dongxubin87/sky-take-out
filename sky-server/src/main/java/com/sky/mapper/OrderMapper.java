@@ -6,6 +6,10 @@ import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.entity.Orders;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Mapper
 public interface OrderMapper {
@@ -35,9 +39,22 @@ public interface OrderMapper {
 
     /**
      * Count the number of orders by status
-     *
      * @param status
      */
     @Select("select count(id) from orders where status = #{status}")
     Integer countStatus(Integer status);
+
+
+    @Update("update orders set status=#{orderStatus},pay_status = #{orderPaidStatus},checkout_time=#{check_out_ime} where number=#{orderNumber}")
+    void updateStatus(Integer orderStatus, Integer orderPaidStatus, LocalDateTime check_out_ime, String orderNumber);
+
+
+    /**
+     * query orders by status and order time
+     * @param status
+     * @param orderTime
+     * @return
+     */
+    @Select("select * from orders where status = #{status} and order_time < #{orderTime}")
+    List<Orders> getByStatusAndOrderTimeLT(Integer status, LocalDateTime orderTime);
 }
