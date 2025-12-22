@@ -101,4 +101,16 @@ private OrderService orderService;
     }
 
 
+    /**
+     * Customer is urging the order
+     * @param id
+     * @return
+     */
+    @GetMapping("/reminder/{id}")
+    @ApiOperation("Customer is urging the order")
+    public Result reminder(@PathVariable("id") Long id) {
+        orderService.reminder(id);
+        return Result.success();
+    }
+
 }
